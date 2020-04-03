@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ty.dao.AirQualityIndexMapper">
+    <resultMap id="PageAir" type="com.ty.entity.AirQualityIndex">
+        <association property="district" javaType="com.ty.entity.District"></association>
+    </resultMap>
+    <select id="getPageAir" resultMap="PageAir">
+        SELECT a.*,d.name FROM `air_quality_index` a INNER JOIN `district` d ON a.districtId=d.id
+        <if test="districtId!=null and districtId>0">
+            where d.id=#{districtId}
+        </if>
+    </select>
+
+</mapper>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+<!--    <link rel="stylesheet" th:href="@{/static/js/zpageNav.css}">-->
+    <style type="text/css">
+        body {
+            text-align: center;
+        }
+
+        #myDiv {
+            display: inline-block;
+            width: 650px;
+            height: 500px;
+            border: 2px dodgerblue solid;
+            text-align: center;
+        }
+
+        table, table tr th, table tr td {
+            border: 1px solid #0094ff;
+        }
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="myDiv">
+    <h2>空气质量监测信息库</h2>
+    <p>按区域查询&nbsp;<select name="name" id="sel">
+        <option v-for="item in dis" v-bind:value="item.id" ><span v-cloak>{{item.name}}</span></option>
+
+    </select>&nbsp;<button id="sub" ref="subRef" v-on:click="getAir(0)">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;<a
+            th:href="@{/district/add}">添加空气指令信息</a></p>
+    <br>
+    <table id="myTable" style="display: inline-block">
+        <tr>
+            <th>序号</th>
+            <th>区域</th>
+            <th>监测时间</th>
+            <th>PM10数据</th>
+            <th>PM2.5数据</th>
+            <th>监测站</th>
+        </tr>
+        <tr v-for="data in datas">
+            <td v-cloak>{{data.id}}</td>
+            <td v-cloak>{{data.district.name}}</td>
+            <td v-cloak>{{data.monitorTime}}</td>
+            <td v-cloak>{{data.pm10}}</td>
+            <td v-cloak>{{data.pm25}}</td>
+            <td v-cloak>{{data.monitoringStation}}</td>
+        </tr>
+
+    </table>
+    <div class="wrap" id="wrap">
+<!--    <zpagenav v-bind:page="page" v-bind:page-size="pageSize" v-bind:total="total"
+    v-bind:max-page="maxPage" v-on:pagehandler="pageHandler">
+
+    </zpagenav>-->
+    </div>
+
+    </div>
+</div>
+</body>
+<script th:src="@{/static/js/vue.js}"></script>
+<script th:src="@{/static/js/axios.min.js}"></script>
+<!--<script th:src="@{/static/js/zpageNav.js}"></script>-->
+<script>
+    axios.get("/district/bind")
+        .then(function (value) {
+            var sel = new Vue({
+                el: "#sel",
+                data: {
+                    dis: value.data
+                }
+            });
+        });
+
+   var a=new Vue({
+        el:"#sub",
+        methods: {
+            getAir:function () {
+                axios.get("/airQualityIndex/getPageAir").then(function (value) {
+                    var tab = new Vue({
+                        el: "#myTable",
+                        data: {
+                            datas: value.data.list,
+                        },
+
+                    })
+
+
+                })
+
+            }
+        },
+
+    })
+    axios.get("/airQualityIndex/getPageAir").then(function (value) {
+        var tab = new Vue({
+            el: "#myTable",
+            data: {
+                datas: value.data.list,
+            },
+
+        })
+
+
+    })
+    /*new Vue({
+        el:'#wrap',
+        data:{
+            page:value.pageNum,
+            pageSzie:value.pageSize,
+            total:value.total,
+            maxPage:value.pages
+        },
+        methods:{
+            pageHandle:function (page) {
+                this.page=page
+            }
+        }
+    })*/
+
+</script>
+</html>
+
